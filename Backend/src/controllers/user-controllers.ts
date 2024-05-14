@@ -5,7 +5,7 @@ import bcrypt from 'bcryptjs';
 import { createToken } from "../utils/token-manager.js";
 import { COOKIE_NAME } from "../utils/constants.js";
 
-const bcrypt = require('bcryptjs');
+// const bcrypt = require('bcryptjs');
 
 export const getAllUsers = async (
   req: Request,
