@@ -1,4 +1,3 @@
-// import React from "react";
 import { Box, Avatar, Typography } from "@mui/material";
 import { useAuth } from "../../context/AuthContext";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
@@ -26,6 +25,7 @@ function isCodeBlock(str: string) {
   }
   return false;
 }
+
 const ChatItem = ({
   content,
   role,
@@ -35,6 +35,7 @@ const ChatItem = ({
 }) => {
   const messageBlocks = extractCodeFromString(content);
   const auth = useAuth();
+  
   return role == "assistant" ? (
     <Box
       sx={{

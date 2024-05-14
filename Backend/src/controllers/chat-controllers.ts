@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import User from "../models/User.js";
 import { configureOpenAI } from "../config/openai-config.js";
 import { OpenAIApi, ChatCompletionRequestMessage } from "openai";
+
 export const generateChatCompletion = async (
   req: Request,
   res: Response,
@@ -30,6 +31,7 @@ export const generateChatCompletion = async (
       model: "gpt-3.5-turbo",
       messages: chats,
     });
+    
     user.chats.push(chatResponse.data.choices[0].message);
     await user.save();
     return res.status(200).json({ chats: user.chats });
