@@ -1,0 +1,47 @@
+pipeline {
+    agent any
+
+    environment {
+        DOCKER_HUB_CREDENTIALS = credentials('docker-hub')
+    }
+
+    stages {
+        stage('Clone repository') {
+            steps {
+                git 'https://github.com/aditisingh0409/SPE-Final-Project.git'
+            }
+        }
+
+        stage('Build and Push Docker Images') {
+            steps {
+                script {
+                    docker.build('frontend', './frontend').push("${env.DOCKER_HUB_CREDENTIALS_USR}/frontend")
+                    docker.build('backend', './backend').push("${env.DOCKER_HUB_CREDENTIALS_USR}/backend")
+                }
+            }
+        }
+
+        stage('Deploy with Ansible') {
+            steps {
+                ansiblePlaybook(
+                    playbook: 'ansible/deploy.yml',
+                    inventory: 'ansible/inventory'
+                )
+            }
+        }
+
+        stage('Monitor with ELK') {
+            steps {
+                script {
+                    sh 'docker-compose -f docker-compose-elk.yml up -d'
+                }
+            }
+        }
+    }
+
+    post {
+        always {
+            cleanWs()
+        }
+    }
+}
