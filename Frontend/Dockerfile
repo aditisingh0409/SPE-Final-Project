@@ -2,7 +2,7 @@
 FROM node:14
 
 # Set the working directory inside the container
-WORKDIR /app
+WORKDIR /SPE/Final_Project/SPE-Final-Project/Frontend
 
 # Copy package.json and package-lock.json files to the working directory
 COPY package*.json ./
@@ -24,3 +24,8 @@ EXPOSE 5173
 
 # Command to run the application
 CMD ["serve", "-s", "build"]
+
+# FROM openjdk:17
+# COPY ./target/Calculator_MT2023085-0.0.1-SNAPSHOT.jar ./
+# WORKDIR ./
+# CMD [“java”,”-jar”,” Calculator_MT2023085-0.0.1-SNAPSHOT.jar”]
