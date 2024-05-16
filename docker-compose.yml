@@ -15,8 +15,8 @@ services:
     ports:
       - "5000:5000"
     # environment:
-    #   - MONGO_URI=mongodb+srv://aditisingh0409:RqpopGmLplZIwA9E@cluster0.wyjfaja.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0
-    #   - CHATGPT_API_KEY=sk-proj-DI2GPKyWy1KJ2JQN0MeaT3BlbkFJdRQ5iJcEs0O3U2xgMUpD
+    #   - MONGO_URI=mongodb+srv://username:password@cluster0.wyjfaja.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0
+    #   - CHATGPT_API_KEY=SECRET_KEY
     depends_on:
       - database
 
