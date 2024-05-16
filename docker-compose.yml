@@ -27,7 +27,6 @@ services:
     ports:
       - "27017:27017"
     volumes:
-      # - home/SPE/Final_Project/SPE-Final-Project/mongo-data:/data/db
       - db-data:/var/lib/mongodb/data
     networks:
       - mern-network
