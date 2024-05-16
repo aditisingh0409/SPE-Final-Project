@@ -1,47 +1,121 @@
+// pipeline {
+//     agent any
+
+//     environment {
+//         DOCKER_HUB_CREDENTIALS = credentials('docker-hub')
+//     }
+
+//     stages {
+//         stage('Clone repository') {
+//             steps {
+//                 git 'https://github.com/aditisingh0409/SPE-Final-Project.git'
+//             }
+//         }
+
+//         stage('Build and Push Docker Images') {
+//             steps {
+//                 script {
+//                     docker.build('frontend', './frontend').push("${env.DOCKER_HUB_CREDENTIALS_USR}/frontend")
+//                     docker.build('backend', './backend').push("${env.DOCKER_HUB_CREDENTIALS_USR}/backend")
+//                 }
+//             }
+//         }
+
+//         stage('Deploy with Ansible') {
+//             steps {
+//                 ansiblePlaybook(
+//                     playbook: 'ansible/deploy.yml',
+//                     inventory: 'ansible/inventory'
+//                 )
+//             }
+//         }
+
+//         stage('Monitor with ELK') {
+//             steps {
+//                 script {
+//                     sh 'docker-compose -f docker-compose-elk.yml up -d'
+//                 }
+//             }
+//         }
+//     }
+
+//     post {
+//         always {
+//             cleanWs()
+//         }
+//     }
+// }
+
 pipeline {
     agent any
 
     environment {
-        DOCKER_HUB_CREDENTIALS = credentials('docker-hub')
+        docker_image1 = 'frontend'
+        docker_image2 = 'backend'
+        github_repo_url = 'https://github.com/aditisingh0409/SPE-Final-Project/'
     }
 
     stages {
-        stage('Clone repository') {
+        stage('Stage 1: Clone repository') {
             steps {
                 git 'https://github.com/aditisingh0409/SPE-Final-Project.git'
             }
         }
-
-        stage('Build and Push Docker Images') {
+        
+        stage('Stage 2: Build Docker Image') {
             steps {
                 script {
-                    docker.build('frontend', './frontend').push("${env.DOCKER_HUB_CREDENTIALS_USR}/frontend")
-                    docker.build('backend', './backend').push("${env.DOCKER_HUB_CREDENTIALS_USR}/backend")
+                    docker_image1 = docker.build 'aditisingh0409/frontend'
+                    docker_image2 = docker.build 'aditisingh0409/backend'
                 }
             }
         }
 
-        stage('Deploy with Ansible') {
+        stage('Stage 3: Push docker image to hub') {
+            steps {
+                script {
+                    docker.withRegistry('', 'DockerCred') {
+                        docker_image1.push()
+                        docker_image2.push()
+                    }
+                }
+            }
+        }
+
+        stage('Stage 4: Clean docker images') {
+            steps {
+                script {
+                    //sh 'docker stop calculator'
+                    //sh 'docker rm calculator'
+                    sh 'docker container prune -f'
+                    sh 'docker image prune -f'
+                }
+            }
+        }
+
+
+        // stage('Build and Push Docker Images') {
+        //     steps {
+        //         script {
+        //             docker.build('aditisingh0409/frontend')
+        //             docker.build('aditisingh0409/backend')
+        //         }
+        //     }
+        // }
+
+        stage('Stage 5: Deploy with Ansible') {
             steps {
                 ansiblePlaybook(
-                    playbook: 'ansible/deploy.yml',
-                    inventory: 'ansible/inventory'
+                    becomeUser: null,
+                    colorized: true,
+                    credentialsId: 'localhost',
+                    disableHostKeyChecking: true,
+                    installation: 'Ansible',
+                    inventory: 'Deployment/inventory',
+                    playbook: 'Deployment/deploy.yml',
+                    sudoUser: null
                 )
             }
-        }
-
-        stage('Monitor with ELK') {
-            steps {
-                script {
-                    sh 'docker-compose -f docker-compose-elk.yml up -d'
-                }
-            }
-        }
-    }
-
-    post {
-        always {
-            cleanWs()
         }
     }
 }
