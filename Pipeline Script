@@ -62,5 +62,13 @@ pipeline {
                 )
             }
         }
+
+        stage('Stage 6: Monitor with ELK') {
+            steps {
+                script {
+                    sh 'docker-compose -f docker-compose-elk.yml up -d'
+                }
+            }
+        }
     }
 }
