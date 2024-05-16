@@ -1,72 +1,26 @@
-// pipeline {
-//     agent any
-
-//     environment {
-//         DOCKER_HUB_CREDENTIALS = credentials('docker-hub')
-//     }
-
-//     stages {
-//         stage('Clone repository') {
-//             steps {
-//                 git 'https://github.com/aditisingh0409/SPE-Final-Project.git'
-//             }
-//         }
-
-//         stage('Build and Push Docker Images') {
-//             steps {
-//                 script {
-//                     docker.build('frontend', './frontend').push("${env.DOCKER_HUB_CREDENTIALS_USR}/frontend")
-//                     docker.build('backend', './backend').push("${env.DOCKER_HUB_CREDENTIALS_USR}/backend")
-//                 }
-//             }
-//         }
-
-//         stage('Deploy with Ansible') {
-//             steps {
-//                 ansiblePlaybook(
-//                     playbook: 'ansible/deploy.yml',
-//                     inventory: 'ansible/inventory'
-//                 )
-//             }
-//         }
-
-//         stage('Monitor with ELK') {
-//             steps {
-//                 script {
-//                     sh 'docker-compose -f docker-compose-elk.yml up -d'
-//                 }
-//             }
-//         }
-//     }
-
-//     post {
-//         always {
-//             cleanWs()
-//         }
-//     }
-// }
-
 pipeline {
     agent any
 
     environment {
         docker_image1 = 'frontend'
         docker_image2 = 'backend'
+        docker_repo = 'aditisingh0409/spe_final_project'
         github_repo_url = 'https://github.com/aditisingh0409/SPE-Final-Project/'
     }
 
     stages {
-        // stage('Stage 1: Clone repository') {
-        //     steps {
-        //         git 'https://github.com/aditisingh0409/SPE-Final-Project.git'
-        //     }
-        // }
+        stage('Stage 1: Clone repository') {
+            steps {
+                checkout([$class: 'GitSCM', branches: [[name: 'main']], userRemoteConfigs: [[url: "${github_repo_url}"]]])
+            }
+        }
         
         stage('Stage 2: Build Docker Image') {
             steps {
                 script {
-                    docker_image1 = docker.build 'aditisingh0409/frontend'
-                    docker_image2 = docker.build 'aditisingh0409/backend'
+                    // Building Docker images for frontend and backend
+                    docker_image1 = docker.build("${docker_repo}:frontend", 'frontend/.')
+                    docker_image2 = docker.build("${docker_repo}:backend", 'backend/.')
                 }
             }
         }
@@ -75,8 +29,9 @@ pipeline {
             steps {
                 script {
                     docker.withRegistry('', 'DockerCred') {
-                        docker_image1.push()
-                        docker_image2.push()
+                        // Pushing Docker images to Docker Hub
+                        docker_image1.push('latest')
+                        docker_image2.push('latest')
                     }
                 }
             }
@@ -92,16 +47,6 @@ pipeline {
                 }
             }
         }
-
-
-        // stage('Build and Push Docker Images') {
-        //     steps {
-        //         script {
-        //             docker.build('aditisingh0409/frontend')
-        //             docker.build('aditisingh0409/backend')
-        //         }
-        //     }
-        // }
 
         stage('Stage 5: Deploy with Ansible') {
             steps {
