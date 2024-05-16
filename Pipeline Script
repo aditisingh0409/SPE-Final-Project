@@ -56,11 +56,11 @@ pipeline {
     }
 
     stages {
-        stage('Stage 1: Clone repository') {
-            steps {
-                git 'https://github.com/aditisingh0409/SPE-Final-Project.git'
-            }
-        }
+        // stage('Stage 1: Clone repository') {
+        //     steps {
+        //         git 'https://github.com/aditisingh0409/SPE-Final-Project.git'
+        //     }
+        // }
         
         stage('Stage 2: Build Docker Image') {
             steps {
