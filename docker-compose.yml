@@ -13,6 +13,7 @@ services:
       - mern-network
 
   backend:
+    image: aditisingh0409/spe_final_project:latest
     build: ./backend
     restart: always
     ports:
