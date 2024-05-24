@@ -1,21 +1,27 @@
-- name: Deploy docker images
-  hosts: localhost
-  become: yes
+- hosts: servers
   tasks:
-    - name: Start docker service
-      service:
-        name: docker
-        state: started
+    - name: Update and upgrade apt packages
+      apt:
+        update_cache: yes
+        upgrade: dist
+
+    - name: Install Docker
+      apt:
+        name: docker.io
+        state: present
+
+    - name: Install Docker Compose
+      get_url:
+        url: https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)
+        dest: /usr/local/bin/docker-compose
+        mode: '0755'
 
     - name: Clone project repository
       git:
         repo: 'https://github.com/aditisingh0409/SPE-Final-Project.git'
-        dest: /home/SPE/Final_Project/SPE-Final-Project
+        dest: /home/your_username/SPE-Final-Project
 
     - name: Start Docker Compose
-      command: docker-compose up -d --build
+      command: docker-compose up -d
       args:
-        chdir: /home/SPE/Final_Project/SPE-Final-Project
-      
-    - name: Prune unwanted images
-      command: docker image prune --force
+        chdir: /home/your_username/SPE-Final-Project
