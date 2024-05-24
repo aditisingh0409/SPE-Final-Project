@@ -40,8 +40,6 @@ pipeline {
         stage('Stage 4: Clean docker images') {
             steps {
                 script {
-                    //sh 'docker stop calculator'
-                    //sh 'docker rm calculator'
                     sh 'docker container prune -f'
                     sh 'docker image prune -f'
                 }
@@ -50,19 +48,12 @@ pipeline {
 
         stage('Stage 5: Deploy with Ansible') {
             steps {
-                ansiblePlaybook(
-                    becomeUser: null,
-                    colorized: true,
-                    credentialsId: 'localhost',
-                    disableHostKeyChecking: true,
-                    installation: 'Ansible',
-                    inventory: 'Deployment/inventory',
-                    playbook: 'Deployment/deploy.yml',
-                    sudoUser: null
-                )
+                dir('Deployment'){
+                    sh 'ansible-playbook -i inventory deploy.yml'
+                }
             }
         }
-
+        
         stage('Stage 6: Monitor with ELK') {
             steps {
                 script {
