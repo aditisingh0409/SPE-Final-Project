@@ -1,5 +1,6 @@
 - name: Deploy docker images
   hosts: localhost
+  become: yes
   tasks:
     - name: Start docker service
       service:
@@ -13,6 +14,8 @@
 
     - name: Start Docker Compose
       command: docker-compose up -d --build
+      args:
+        chdir: /home/SPE/Final_Project/SPE-Final-Project
       
     - name: Prune unwanted images
       command: docker image prune --force
